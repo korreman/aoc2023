@@ -49,12 +49,22 @@ impl<'a, T: 'static + FromStr> Iterator for Numbers<'a, T> {
 
 #[cfg(test)]
 mod tests {
+    use std::fmt::Debug;
+
     use super::*;
     use itertools::Itertools;
 
+    fn test<T: 'static + FromStr + Eq + Debug>(input: &str, expected: Vec<T>) {
+        let nums = Numbers::<T>::new(input).collect_vec();
+        assert_eq!(nums, expected);
+    }
+
     #[test]
-    fn test() {
-        let nums = Numbers::<i32>::new("123abca321fwip-321").collect_vec();
-        assert_eq!(nums, vec![123, 321, -321]);
+    fn test1() {
+        test("123abca321fwip-321", vec![123, 321, -321]);
+        test(
+            "'apofkaaafeowij32'asjf4083 40934, [-2304]",
+            vec![32u32, 4083u32, 40934u32, 2304u32],
+        );
     }
 }
