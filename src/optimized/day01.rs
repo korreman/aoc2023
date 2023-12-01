@@ -2,33 +2,18 @@ pub fn run(input: &str) -> (u32, u32) {
     let mut part1 = 0;
     let mut part2 = 0;
 
+    let mut tracker_fwd = Tracker::new(&Tracker::FORWARD);
+    let mut tracker_bck = Tracker::new(&Tracker::BACKWARD);
+
     for line in input.lines() {
-        let (l_digit, l_word) = compute(line.bytes(), &Tracker::FORWARD);
-        let (r_digit, r_word) = compute(line.bytes().rev(), &Tracker::BACKWARD);
+        let (l_digit, l_word) = tracker_fwd.compute(line.bytes());
+        let (r_digit, r_word) = tracker_bck.compute(line.bytes().rev());
+        tracker_fwd.reset();
+        tracker_bck.reset();
         part1 += l_digit * 10 + r_digit;
         part2 += l_word * 10 + r_word;
     }
     (part1, part2)
-}
-
-fn compute(line: impl Iterator<Item = u8>, numbers: &'static [&'static [u8]; 9]) -> (u32, u32) {
-    let mut word = 0;
-    let mut tracker = Tracker::new(numbers);
-    for byte in line {
-        let digit = byte.wrapping_sub(b'0');
-        if digit < 10 {
-            if word == 0 {
-                word = digit as u32;
-            }
-            return (digit as u32, word);
-        }
-        if word == 0 {
-            if let Some(n) = tracker.advance(byte) {
-                word = n as u32;
-            }
-        }
-    }
-    panic!()
 }
 
 struct Tracker {
@@ -42,6 +27,25 @@ impl Tracker {
             progress: [0; 9],
             numbers,
         }
+    }
+
+    fn compute(&mut self, line: impl Iterator<Item = u8>) -> (u32, u32) {
+        let mut word = 0;
+        for byte in line {
+            let digit = byte.wrapping_sub(b'0');
+            if digit < 10 {
+                if word == 0 {
+                    word = digit as u32;
+                }
+                return (digit as u32, word);
+            }
+            if word == 0 {
+                if let Some(n) = self.advance(byte) {
+                    word = n as u32;
+                }
+            }
+        }
+        panic!()
     }
 
     #[inline(always)]
@@ -61,6 +65,11 @@ impl Tracker {
         None
     }
 
+    #[inline(always)]
+    fn reset(&mut self) {
+        self.progress = [0; 9];
+    }
+
     const FORWARD: [&[u8]; 9] = [
         b"one", b"two", b"three", b"four", b"five", b"six", b"seven", b"eight", b"nine",
     ];
@@ -72,12 +81,13 @@ impl Tracker {
 
 #[cfg(test)]
 mod tests {
-    use super::{compute, Tracker};
+    use super::Tracker;
 
     #[test]
     fn single() {
         let input = "hhrldnffive7six6onefivezllprrncczseven";
-        assert_eq!(compute(input.bytes(), &Tracker::FORWARD), (7, 5));
+        let mut tracker = Tracker::new(&Tracker::FORWARD);
+        assert_eq!(tracker.compute(input.bytes()), (7, 5));
     }
 
     #[test]
