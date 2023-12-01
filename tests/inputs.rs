@@ -66,7 +66,7 @@ mod inputs {
         );
     }
 
-    input!(day01, solutions);
+    input!(day01, optimized);
     //input!(day02, solutions);
     //input!(day03, solutions);
     //input!(day04, solutions);

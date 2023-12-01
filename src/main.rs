@@ -7,6 +7,7 @@ use comfy_table::{presets::UTF8_FULL_CONDENSED, Cell, CellAlignment, Table};
 
 #[allow(dead_code)]
 mod solutions;
+mod optimized;
 pub mod util;
 
 fn main() {
@@ -18,7 +19,7 @@ fn main() {
         println!("Profile: {}", path.file_name().unwrap().to_str().unwrap());
         path.push("inputs");
         let mut state = State::new(path);
-        state.run_day(1, &solutions::day01::run);
+        state.run_day(1, &optimized::day01::run);
         //state.run_day(2, &solutions::day02::run);
         //state.run_day(3, &solutions::day03::run);
         //state.run_day(4, &solutions::day04::run);
