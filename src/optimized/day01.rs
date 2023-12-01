@@ -3,28 +3,28 @@ pub fn run(input: &str) -> (u32, u32) {
     let mut part2 = 0;
 
     for line in input.lines() {
-        let (la, lb) = compute(line.bytes(), &Tracker::FORWARD);
-        let (ra, rb) = compute(line.bytes().rev(), &Tracker::BACKWARD);
-        part1 += la * 10 + ra;
-        part2 += lb * 10 + rb;
+        let (l_digit, l_word) = compute(line.bytes(), &Tracker::FORWARD);
+        let (r_digit, r_word) = compute(line.bytes().rev(), &Tracker::BACKWARD);
+        part1 += l_digit * 10 + r_digit;
+        part2 += l_word * 10 + r_word;
     }
     (part1, part2)
 }
 
 fn compute(line: impl Iterator<Item = u8>, numbers: &'static [&'static [u8]; 9]) -> (u32, u32) {
-    let mut b = 0;
+    let mut word = 0;
     let mut tracker = Tracker::new(numbers);
-    for c in line {
-        let digit = c.wrapping_sub(b'0');
+    for byte in line {
+        let digit = byte.wrapping_sub(b'0');
         if digit < 10 {
-            if b == 0 {
-                b = digit as u32;
+            if word == 0 {
+                word = digit as u32;
             }
-            return (digit as u32, b);
+            return (digit as u32, word);
         }
-        if b == 0 {
-            if let Some(word) = tracker.advance(c) {
-                b = word as u32;
+        if word == 0 {
+            if let Some(n) = tracker.advance(byte) {
+                word = n as u32;
             }
         }
     }
