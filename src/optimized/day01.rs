@@ -11,36 +11,35 @@ pub fn run(input: &str) -> (u32, u32) {
     (part1, part2)
 }
 
-fn compute(line: impl Iterator<Item = u8>, numbers: &'static [&'static [u8]; 10]) -> (u32, u32) {
-    let mut b = None;
+fn compute(line: impl Iterator<Item = u8>, numbers: &'static [&'static [u8]; 9]) -> (u32, u32) {
+    let mut b = 0;
     let mut tracker = Tracker::new(numbers);
-    let a = 'outer: {
-        for c in line {
-            let digit = c.wrapping_sub(b'0');
-            if digit < 10 {
-                b.get_or_insert(digit as u32);
-                break 'outer digit as u32;
+    for c in line {
+        let digit = c.wrapping_sub(b'0');
+        if digit < 10 {
+            if b == 0 {
+                b = digit as u32;
             }
-            if b.is_none() {
-                if let Some(word) = tracker.advance(c) {
-                    b = Some(word as u32);
-                }
+            return (digit as u32, b);
+        }
+        if b == 0 {
+            if let Some(word) = tracker.advance(c) {
+                b = word as u32;
             }
         }
-        panic!()
-    };
-    (a, b.unwrap())
+    }
+    panic!()
 }
 
 struct Tracker {
-    progress: [usize; 10],
-    numbers: &'static [&'static [u8]; 10],
+    progress: [usize; 9],
+    numbers: &'static [&'static [u8]; 9],
 }
 
 impl Tracker {
-    fn new(numbers: &'static [&'static [u8]; 10]) -> Self {
+    fn new(numbers: &'static [&'static [u8]; 9]) -> Self {
         Self {
-            progress: [0; 10],
+            progress: [0; 9],
             numbers,
         }
     }
@@ -51,7 +50,7 @@ impl Tracker {
             if b == self.numbers[i][*p] {
                 *p += 1;
                 if *p == self.numbers[i].len() {
-                    return Some(i);
+                    return Some(i + 1);
                 }
             } else if b == self.numbers[i][0] {
                 *p = 1;
@@ -62,18 +61,18 @@ impl Tracker {
         None
     }
 
-    const FORWARD: [&[u8]; 10] = [
-        b"zero", b"one", b"two", b"three", b"four", b"five", b"six", b"seven", b"eight", b"nine",
+    const FORWARD: [&[u8]; 9] = [
+        b"one", b"two", b"three", b"four", b"five", b"six", b"seven", b"eight", b"nine",
     ];
 
-    const BACKWARD: [&[u8]; 10] = [
-        b"orez", b"eno", b"owt", b"eerht", b"ruof", b"evif", b"xis", b"neves", b"thgie", b"enin",
+    const BACKWARD: [&[u8]; 9] = [
+        b"eno", b"owt", b"eerht", b"ruof", b"evif", b"xis", b"neves", b"thgie", b"enin",
     ];
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{Tracker, compute};
+    use super::{compute, Tracker};
 
     #[test]
     fn single() {
