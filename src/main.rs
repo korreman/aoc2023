@@ -20,7 +20,7 @@ fn main() {
         path.push("inputs");
         let mut state = State::new(path);
         state.run_day(1, &optimized::day01::run);
-        //state.run_day(2, &solutions::day02::run);
+        state.run_day(2, &solutions::day02::run);
         //state.run_day(3, &solutions::day03::run);
         //state.run_day(4, &solutions::day04::run);
         //state.run_day(5, &solutions::day05::run);
