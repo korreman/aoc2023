@@ -103,14 +103,10 @@ pub fn run(input: &str) -> (u32, u32) {
     let part1 = numbers.values().cloned().sum();
     let mut part2 = 0;
     for gear in gears.values_mut() {
-        println!("{gear:?}");
         gear.sort_unstable();
-        println!("{gear:?}");
         gear.dedup();
-        println!("{gear:?}");
-        println!();
         if gear.len() != 2 {
-            break;
+            continue;
         }
         part2 += gear.iter().map(|n| n.2).product::<u32>();
     }
