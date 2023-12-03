@@ -70,11 +70,11 @@ impl Tracker {
         self.progress = [0; 9];
     }
 
-    const FORWARD: [&[u8]; 9] = [
+    const FORWARD: [&'static [u8]; 9] = [
         b"one", b"two", b"three", b"four", b"five", b"six", b"seven", b"eight", b"nine",
     ];
 
-    const BACKWARD: [&[u8]; 9] = [
+    const BACKWARD: [&'static [u8]; 9] = [
         b"eno", b"owt", b"eerht", b"ruof", b"evif", b"xis", b"neves", b"thgie", b"enin",
     ];
 }
