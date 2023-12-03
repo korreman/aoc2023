@@ -9,20 +9,20 @@ pub fn run(input: &str) -> (u32, u32) {
     // Add padding
     rows.push(Vec::new());
     for row in &mut rows {
-        row.push(Elem::Symbol(usize::MAX - 1, false));
-        row.push(Elem::Symbol(usize::MAX, false));
+        row.push(Elem::symbol(usize::MAX - 1, false));
+        row.push(Elem::symbol(usize::MAX, false));
     }
 
     // Identify touching numbers and symbols
     let mut numbers = HashMap::new();
     let mut gears = HashMap::new();
 
-    let mut check_and_record = |row, range: &Range<usize>, value: u32, (i, j), gear: bool| {
-        if range.contains(j) {
-            numbers.insert((row, range.start), value);
-            if gear {
-                let entry = gears.entry((i, j)).or_insert(Vec::new());
-                entry.push((row, range.start, value));
+    let mut check_and_record = |i, n: &Number, is, s: &Symbol| {
+        if n.range.contains(&s.j) {
+            numbers.insert((i, n.range.start), n.value);
+            if s.gear {
+                let entry = gears.entry((is, s.j)).or_insert(Vec::new());
+                entry.push((i, n.range.start, n.value));
             }
         }
     };
@@ -34,19 +34,14 @@ pub fn run(input: &str) -> (u32, u32) {
         let mut head2 = row2.next().unwrap();
         loop {
             match head1 {
-                (Elem::Symbol(j, gear), Elem::Number { value, range, .. })
-                | (Elem::Number { value, range }, Elem::Symbol(j, gear)) => {
-                    check_and_record(i, range, *value, (i, j), *gear);
+                (Elem::Symbol(s), Elem::Number(n)) | (Elem::Number(n), Elem::Symbol(s)) => {
+                    check_and_record(i, n, i, s);
                 }
                 _ => {}
             }
             match (head1.0, head2) {
-                (Elem::Number { value, range }, Elem::Symbol(j, gear)) => {
-                    check_and_record(i, range, *value, (i + 1, j), *gear);
-                }
-                (Elem::Symbol(j, gear), Elem::Number { value, range }) => {
-                    check_and_record(i + 1, range, *value, (i, j), *gear);
-                }
+                (Elem::Number(n), Elem::Symbol(s)) => check_and_record(i, n, i + 1, s),
+                (Elem::Symbol(s), Elem::Number(n)) => check_and_record(i + 1, n, i, s),
                 _ => {}
             }
             if head1.0.start() < head2.start() {
@@ -91,7 +86,7 @@ fn parse_line(line: &str) -> Vec<Elem> {
                 }
                 summary.push(Elem::number(value, j, end));
             }
-            symbol => summary.push(Elem::Symbol(j, symbol == b'*')),
+            symbol => summary.push(Elem::symbol(j, symbol == b'*')),
         }
     }
     summary
@@ -99,24 +94,40 @@ fn parse_line(line: &str) -> Vec<Elem> {
 
 #[derive(Debug)]
 enum Elem {
-    Symbol(usize, bool),
-    Number { value: u32, range: Range<usize> },
+    Symbol(Symbol),
+    Number(Number),
 }
 
 impl Elem {
+    fn symbol(j: usize, gear: bool) -> Self {
+        Self::Symbol(Symbol { j, gear })
+    }
+
     fn number(value: u32, start: usize, end: usize) -> Self {
-        Self::Number {
+        Self::Number(Number {
             value,
             range: start.saturating_sub(1)..end + 2,
-        }
+        })
     }
 
     fn start(&self) -> usize {
         match self {
-            Elem::Symbol(j, ..) => *j,
-            Elem::Number { range, .. } => range.start,
+            Elem::Symbol(s) => s.j,
+            Elem::Number(n) => n.range.start,
         }
     }
+}
+
+#[derive(Debug)]
+struct Symbol {
+    j: usize,
+    gear: bool,
+}
+
+#[derive(Debug)]
+struct Number {
+    range: Range<usize>,
+    value: u32,
 }
 
 #[cfg(test)]
