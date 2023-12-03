@@ -13,8 +13,20 @@ pub fn run(input: &str) -> (u32, u32) {
         row.push(Elem::Symbol(usize::MAX, false));
     }
 
+    // Identify touching numbers and symbols
     let mut numbers = HashMap::new();
     let mut gears = HashMap::new();
+
+    let mut check_and_record = |row, range: &Range<usize>, value: u32, (i, j), gear: bool| {
+        if range.contains(j) {
+            numbers.insert((row, range.start), value);
+            if gear {
+                let entry = gears.entry((i, j)).or_insert(Vec::new());
+                entry.push((row, range.start, value));
+            }
+        }
+    };
+
     for (i, (row1, row2)) in rows.iter().tuple_windows().enumerate() {
         let mut row1 = row1.iter().tuple_windows::<(_, _)>();
         let mut row2 = row2.iter();
@@ -22,54 +34,18 @@ pub fn run(input: &str) -> (u32, u32) {
         let mut head2 = row2.next().unwrap();
         loop {
             match head1 {
-                (Elem::Symbol(j, gear), Elem::Number { value, range, .. }) => {
-                    if *j == range.start.saturating_sub(1) {
-                        numbers.insert((i, range.start), value);
-                        if *gear {
-                            gears
-                                .entry((i, j))
-                                .or_insert(Vec::new())
-                                .push((i, range.start, value));
-                        }
-                    }
-                }
-                (Elem::Number { value, range }, Elem::Symbol(j, gear)) => {
-                    if range.end == *j {
-                        numbers.insert((i, range.start), value);
-                        if *gear {
-                            gears
-                                .entry((i, j))
-                                .or_insert(Vec::new())
-                                .push((i, range.start, value));
-                        }
-                    }
+                (Elem::Symbol(j, gear), Elem::Number { value, range, .. })
+                | (Elem::Number { value, range }, Elem::Symbol(j, gear)) => {
+                    check_and_record(i, range, *value, (i, j), *gear);
                 }
                 _ => {}
             }
             match (head1.0, head2) {
-                (Elem::Number { value, range }, Elem::Symbol(col, gear)) => {
-                    if *col >= range.start.saturating_sub(1) && range.end >= *col {
-                        numbers.insert((i, range.start), value);
-                        if *gear {
-                            gears.entry((i + 1, col)).or_insert(Vec::new()).push((
-                                i,
-                                range.start,
-                                value,
-                            ));
-                        }
-                    }
+                (Elem::Number { value, range }, Elem::Symbol(j, gear)) => {
+                    check_and_record(i, range, *value, (i + 1, j), *gear);
                 }
-                (Elem::Symbol(col, gear), Elem::Number { value, range }) => {
-                    if *col >= range.start.saturating_sub(1) && range.end >= *col {
-                        numbers.insert((i + 1, range.start), value);
-                        if *gear {
-                            gears.entry((i, col)).or_insert(Vec::new()).push((
-                                i + 1,
-                                range.start,
-                                value,
-                            ));
-                        }
-                    }
+                (Elem::Symbol(j, gear), Elem::Number { value, range }) => {
+                    check_and_record(i + 1, range, *value, (i, j), *gear);
                 }
                 _ => {}
             }
@@ -84,6 +60,8 @@ pub fn run(input: &str) -> (u32, u32) {
             }
         }
     }
+
+    // Compute results
     let part1 = numbers.values().cloned().sum();
     let mut part2 = 0;
     for gear in gears.values_mut() {
@@ -111,10 +89,7 @@ fn parse_line(line: &str) -> Vec<Elem> {
                     end = c;
                     value = value * 10 + (next_d - b'0') as u32;
                 }
-                summary.push(Elem::Number {
-                    value,
-                    range: j..end + 1,
-                });
+                summary.push(Elem::number(value, j, end));
             }
             symbol => summary.push(Elem::Symbol(j, symbol == b'*')),
         }
@@ -129,6 +104,13 @@ enum Elem {
 }
 
 impl Elem {
+    fn number(value: u32, start: usize, end: usize) -> Self {
+        Self::Number {
+            value,
+            range: start.saturating_sub(1)..end + 2,
+        }
+    }
+
     fn start(&self) -> usize {
         match self {
             Elem::Symbol(j, ..) => *j,
