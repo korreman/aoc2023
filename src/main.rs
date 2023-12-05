@@ -71,8 +71,8 @@ impl State {
         let mut path = self.input_folder.clone();
         path.push(format!("day{day:02}.txt"));
         // Read input
-        let input = read_to_string(path)
-            .unwrap_or_else(|_| panic!("missing input: {}", self.input_folder.display()));
+        let input = read_to_string(&path)
+            .unwrap_or_else(|_| panic!("missing input: {}", path.display()));
 
         // Run solution
         let start = Instant::now();
