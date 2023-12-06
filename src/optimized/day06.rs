@@ -27,7 +27,5 @@ pub fn run(input: &str) -> (u64, u64) {
 #[inline(always)]
 fn ways_to_beat(time: u64, dist: u64) -> u64 {
     let (t, d) = (time as f64, dist as f64);
-    let f = (t - (t.powi(2) - 4.0 * d).sqrt()) / 2.0;
-    let f = f.ceil() as u64;
-    time - f * 2 + 1
+    (t.powi(2) - 4.0 * d).sqrt().ceil() as u64 + 1
 }
