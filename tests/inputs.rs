@@ -72,7 +72,7 @@ mod inputs {
     input!(day04, solutions);
     input!(day05, solutions);
     input!(day06, solutions);
-    //input!(day07, solutions);
+    input!(day07, solutions);
     //input!(day08, solutions);
     //input!(day09, solutions);
     //input!(day10, solutions);
