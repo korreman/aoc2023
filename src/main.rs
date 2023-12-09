@@ -26,8 +26,8 @@ fn main() {
         state.run_day(5, &solutions::day05::run);
         state.run_day(6, &optimized::day06::run);
         state.run_day(7, &solutions::day07::run);
-        state.run_day(8, &solutions::day08::run);
-        //state.run_day(9, &solutions::day09::run);
+        //state.run_day(8, &solutions::day08::run);
+        state.run_day(9, &solutions::day09::run);
         //state.run_day(10, &solutions::day10::run);
         //state.run_day(11, &solutions::day11::run);
         //state.run_day(12, &solutions::day12::run);
