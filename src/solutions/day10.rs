@@ -1,4 +1,4 @@
-use std::{fmt::{Display, Write}};
+use std::fmt::{Display, Write};
 
 use itertools::Itertools;
 
@@ -77,6 +77,7 @@ pub fn run(input: &str) -> (usize, usize) {
 
     // 2. Identify which direction is clockwise.
     // This can be accomplished by scanning from one side until a part of the path is encountered.
+    // TODO: This needs to be correlated with which part of the path it is on, A, or B.
     let y = start.y;
     let mut inner_side = None;
     for p in pos(0, y).line(&start).unwrap() {
