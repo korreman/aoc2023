@@ -1,11 +1,11 @@
 use std::{
     fmt::{Display, Write},
-    ops::{Add, AddAssign, Index, IndexMut},
+    ops::{Add, AddAssign, Index, IndexMut, SubAssign, Sub},
 };
 
 use crate::util::graph::{Graph, GraphImpl};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Pos {
     pub x: usize,
     pub y: usize,
@@ -101,6 +101,24 @@ impl Add<Pos> for Pos {
         Pos {
             x: self.x + rhs.x,
             y: self.y + rhs.y,
+        }
+    }
+}
+
+impl SubAssign for Pos {
+    fn sub_assign(&mut self, rhs: Self) {
+        self.x -= rhs.x;
+        self.y -= rhs.y;
+    }
+}
+
+impl Sub<Pos> for Pos {
+    type Output = Pos;
+
+    fn sub(self, rhs: Pos) -> Self::Output {
+        Pos {
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
         }
     }
 }
