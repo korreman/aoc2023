@@ -1,6 +1,6 @@
 use std::{
     fmt::{Display, Write},
-    ops::{Add, AddAssign, Index, IndexMut, SubAssign, Sub},
+    ops::{Add, AddAssign, Index, IndexMut, Sub, SubAssign},
 };
 
 use crate::util::graph::{Graph, GraphImpl};
@@ -30,7 +30,7 @@ impl Pos {
         } else {
             Some(Line {
                 current: self,
-                target: other,
+                target: *other,
                 done: false,
             })
         }
@@ -306,13 +306,13 @@ impl From<Dir4> for Dir8 {
     }
 }
 
-pub struct Line<'a> {
+pub struct Line {
     current: Pos,
-    target: &'a Pos,
+    target: Pos,
     done: bool,
 }
 
-impl<'a> Iterator for Line<'a> {
+impl Iterator for Line {
     type Item = Pos;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -389,6 +389,14 @@ impl<T: Clone> Grid<T> {
             }
         }
         grid
+    }
+
+    pub fn row(&self, i: usize) -> Line {
+        pos(0, i).line(&pos(self.width - 1, i)).unwrap()
+    }
+
+    pub fn col(&self, j: usize) -> Line {
+        pos(j, 0).line(&pos(j, self.height - 1)).unwrap()
     }
 }
 
