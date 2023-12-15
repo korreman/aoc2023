@@ -129,7 +129,7 @@ pub enum Rot {
     R,
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug, Hash)]
 pub enum Dir4 {
     N,
     E,
@@ -334,7 +334,27 @@ impl Iterator for Line {
     }
 }
 
-#[derive(Clone)]
+impl DoubleEndedIterator for Line {
+    fn next_back(&mut self) -> Option<Self::Item> {
+        let res = self.target;
+        if self.done {
+            return None;
+        } else if self.current.x < self.target.x {
+            self.target.x -= 1;
+        } else if self.current.x > self.target.x {
+            self.target.x += 1;
+        } else if self.current.y < self.target.y {
+            self.target.y -= 1;
+        } else if self.current.y > self.target.y {
+            self.target.y += 1;
+        } else {
+            self.done = true;
+        }
+        Some(res)
+    }
+}
+
+#[derive(Clone, Hash, PartialEq, Eq, Debug)]
 pub struct Grid<T> {
     data: Vec<T>,
     width: usize,

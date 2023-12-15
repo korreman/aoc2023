@@ -6,3 +6,4 @@ pub mod grid3d;
 pub mod pathfinding;
 pub mod queue;
 pub mod parsers;
+pub mod io;
