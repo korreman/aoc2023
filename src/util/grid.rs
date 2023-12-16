@@ -38,10 +38,10 @@ impl Pos {
 
     pub fn step(self, dir: Dir4) -> Self {
         match dir {
-            Dir4::N => pos(self.x, self.y - 1),
+            Dir4::N => pos(self.x, self.y.wrapping_sub(1)),
             Dir4::E => pos(self.x + 1, self.y),
             Dir4::S => pos(self.x, self.y + 1),
-            Dir4::W => pos(self.x - 1, self.y),
+            Dir4::W => pos(self.x.wrapping_sub(1), self.y),
         }
     }
 
@@ -129,7 +129,7 @@ pub enum Rot {
     R,
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, Debug, Hash)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug, Hash, PartialOrd, Ord)]
 pub enum Dir4 {
     N,
     E,

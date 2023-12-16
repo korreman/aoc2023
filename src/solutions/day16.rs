@@ -37,11 +37,14 @@ pub fn run(input: &str) -> (usize, usize) {
 }
 
 fn solve(grid: &Grid<Cell>, p: Pos, d: Dir4) -> usize {
-    let mut surface = grid.map(|_| [false; 4]);
+    let mut surface = grid.map(|_| [false; 2]);
     let mut beams = vec![(p, d)];
     let mut beams_off = vec![];
     while !beams.is_empty() {
         for (p, d) in &beams {
+            if !surface.contains(*p) || surface[*p][dir2idx(*d)] {
+                continue;
+            }
             surface[*p][dir2idx(*d)] = true;
             match (grid[*p], d) {
                 (Cell::Empty, _)
@@ -70,11 +73,6 @@ fn solve(grid: &Grid<Cell>, p: Pos, d: Dir4) -> usize {
                 }
             }
         }
-        beams_off = beams_off
-            .iter()
-            .cloned()
-            .filter(|(p, d)| surface.contains(*p) && !surface[*p][dir2idx(*d)])
-            .collect_vec();
         swap(&mut beams, &mut beams_off);
         beams_off.clear();
     }
@@ -86,14 +84,12 @@ fn solve(grid: &Grid<Cell>, p: Pos, d: Dir4) -> usize {
 
 fn dir2idx(dir: Dir4) -> usize {
     match dir {
-        Dir4::N => 0,
-        Dir4::E => 1,
-        Dir4::S => 2,
-        Dir4::W => 3,
+        Dir4::N | Dir4::S => 0,
+        Dir4::W | Dir4::E => 1,
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 enum Cell {
     Empty,
     Slash,
