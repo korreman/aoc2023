@@ -34,7 +34,7 @@ fn main() {
         state.run_day(13, &solutions::day13::run);
         state.run_day(14, &solutions::day14::run);
         state.run_day(15, &solutions::day15::run);
-        //state.run_day(16, &solutions::day16::run);
+        state.run_day(16, &solutions::day16::run);
         //state.run_day(17, &solutions::day17::run);
         //state.run_day(18, &solutions::day18::run);
         //state.run_day(19, &solutions::day19::run);
