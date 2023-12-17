@@ -23,7 +23,7 @@ where
     type AllNodes: Iterator<Item = Self::Node>;
 
     /// Mapping function, creates a new graph with the exact same structure.
-    fn map<U, F: FnMut(&T) -> U>(&self, f: F) -> Self::Map<U>;
+    fn map<U, F: Copy + FnMut(&T) -> U>(&self, f: F) -> Self::Map<U>;
     type Map<U>: GraphImpl<U, Node = Self::Node>;
 }
 
