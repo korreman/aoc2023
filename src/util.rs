@@ -7,3 +7,4 @@ pub mod pathfinding;
 pub mod queue;
 pub mod parsers;
 pub mod io;
+pub mod math;
